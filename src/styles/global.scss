@@ -1,0 +1,51 @@
+@use "variables" as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+}
+
+// Utility classes for scene image grids
+.scene-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $grid-gap;
+}
+
+.scene-cell {
+  width: $scene-size;
+  height: $scene-size;
+  overflow: hidden;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+  background: var(--el-fill-color-lighter);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.file-section-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--el-text-color-regular);
+  margin: 12px 0 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}

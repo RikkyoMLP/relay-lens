@@ -1,0 +1,3 @@
+[submodule "hsi-utils"]
+	path = hsi-utils
+	url = https://github.com/RikkyoMLP/hsi-utils.git

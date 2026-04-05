@@ -1,0 +1,44 @@
+{
+  "name": "relay-lens",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c cyan,green \"vite --open\" \"uv run uvicorn server.app:app --host 0.0.0.0 --port 7860\"",
+    "build": "vite build",
+    "preview": "concurrently -n frontend,backend -c cyan,green \"vite preview\" \"uv run uvicorn server.app:app --host 0.0.0.0 --port 7860\"",
+    "lint": "oxlint src/",
+    "format": "oxfmt --write src/ index.html",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "concurrently": "^9.2.1",
+    "element-plus": "^2.13.7",
+    "pinia": "^3.0.4",
+    "typescript": "^6.0.2",
+    "vite": "8.0.8",
+    "vue": "3.5.31"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@unocss/preset-wind3": "^66.6.8",
+    "@vitejs/devtools": "^0.1.13",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "oxfmt": "^0.44.0",
+    "oxlint": "^1.59.0",
+    "sass": "^1.99.0",
+    "unocss": "^66.6.8",
+    "vite-plugin-vue-tracer": "^1.3.0"
+  },
+  "lint-staged": {
+    "src/**/*.{vue,ts,js,css,scss}": "oxfmt --write",
+    "*.{html,json}": "oxfmt --write"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

@@ -1,0 +1,21 @@
+[project]
+name = "relay-lens"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.3",
+    "hsi-utils",
+    "python-multipart>=0.0.24",
+    "uvicorn>=0.43.0",
+]
+
+[tool.uv.workspace]
+members = ["hsi-utils"]
+
+[tool.uv.sources]
+hsi-utils = { workspace = true }
+
+[tool.uv]
+config-settings-package = { "hsi-utils" = { editable_mode = "compat" } }

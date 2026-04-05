@@ -1,0 +1,11 @@
+.git
+.venv
+node_modules
+dist
+__pycache__
+*.pyc
+input/*.mat
+mask/*.mat
+.DS_Store
+.agents
+references
