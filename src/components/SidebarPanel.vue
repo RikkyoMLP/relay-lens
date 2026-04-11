@@ -5,7 +5,7 @@ import FileTree from "./FileTree.vue";
 
 <template>
   <div class="sidebar-panel">
-    <h3 class="sidebar-title">Relay Lens</h3>
+    <h3 class="sidebar-panel__title">Relay Lens</h3>
     <FileUploader />
     <el-divider />
     <FileTree />
@@ -13,10 +13,12 @@ import FileTree from "./FileTree.vue";
 </template>
 
 <style lang="scss" scoped>
-.sidebar-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--el-text-color-primary);
+.sidebar-panel {
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--el-text-color-primary);
+  }
 }
 </style>

@@ -52,7 +52,7 @@ const sections = computed(() => {
   </div>
 
   <div v-else>
-    <div v-for="section in sections" :key="section!.file.fileId" class="file-block">
+    <div v-for="section in sections" :key="section!.file.fileId" class="mb-6">
       <template v-for="chData in section!.channels" :key="chData.ch">
         <SceneGrid
           :image-urls="chData.urls"
@@ -62,9 +62,3 @@ const sections = computed(() => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.file-block {
-  margin-bottom: 24px;
-}
-</style>

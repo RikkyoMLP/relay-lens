@@ -54,6 +54,12 @@ importers:
       oxlint:
         specifier: ^1.59.0
         version: 1.59.0
+      prettier:
+        specifier: ^3.8.2
+        version: 3.8.2
+      prettier-plugin-vue:
+        specifier: ^1.1.6
+        version: 1.1.6
       sass:
         specifier: ^1.99.0
         version: 1.99.0
@@ -1530,6 +1536,19 @@ packages:
   powershell-utils@0.1.0:
     resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
     engines: {node: '>=20'}
+
+  prettier-plugin-vue@1.1.6:
+    resolution: {integrity: sha512-trQ/oY+6hSsGe2zPIFThXMIM0TbxMEbk2VOrKjwHWuSz7OEo0rnumbz9a47OxVPCaAnGY9vZG8qDTiTmk9bq0A==}
+
+  prettier@2.8.8:
+    resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+
+  prettier@3.8.2:
+    resolution: {integrity: sha512-8c3mgTe0ASwWAJK+78dpviD+A8EqhndQPUBpNUIPt6+xWlIigCwfN01lWr9MAede4uqXGTEKeQWTvzb3vjia0Q==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   publint@0.3.18:
     resolution: {integrity: sha512-JRJFeBTrfx4qLwEuGFPk+haJOJN97KnPuK01yj+4k/Wj5BgoOK5uNsivporiqBjk2JDaslg7qJOhGRnpltGeog==}
@@ -3333,6 +3352,14 @@ snapshots:
       source-map-js: 1.2.1
 
   powershell-utils@0.1.0: {}
+
+  prettier-plugin-vue@1.1.6:
+    dependencies:
+      prettier: 2.8.8
+
+  prettier@2.8.8: {}
+
+  prettier@3.8.2: {}
 
   publint@0.3.18:
     dependencies:

@@ -43,16 +43,16 @@ const sections = computed(() => {
 </script>
 
 <template>
-  <div v-if="!fileStore.selectedKey" class="empty-state">
+  <div v-if="!fileStore.selectedKey" class="py-12">
     <el-empty description="Select a key from the toolbar to visualize" :image-size="64" />
   </div>
 
-  <div v-else-if="sections.length === 0" class="empty-state">
+  <div v-else-if="sections.length === 0" class="py-12">
     <el-empty description="No HSI data for the selected key" :image-size="64" />
   </div>
 
   <div v-else>
-    <div v-for="section in sections" :key="section!.file.fileId" class="file-block">
+    <div v-for="section in sections" :key="section!.file.fileId" class="mb-6">
       <SceneGrid :image-urls="section!.rgbUrls" :label="`${section!.file.filename} - RGB`" />
 
       <SceneGrid
@@ -63,13 +63,3 @@ const sections = computed(() => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.empty-state {
-  padding: 48px 0;
-}
-
-.file-block {
-  margin-bottom: 24px;
-}
-</style>

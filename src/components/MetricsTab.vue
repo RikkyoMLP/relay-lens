@@ -34,7 +34,7 @@ const sections = computed(() => {
       <div class="file-section-header">
         {{ section!.file.filename }} ({{ section!.metricKeys.join(", ") }})
       </div>
-      <img :src="section!.imgUrl" class="metrics-plot" loading="lazy" />
+      <img :src="section!.imgUrl" class="metrics-block__plot" loading="lazy" />
     </div>
   </div>
 </template>
@@ -42,11 +42,11 @@ const sections = computed(() => {
 <style lang="scss" scoped>
 .metrics-block {
   margin-bottom: 24px;
-}
 
-.metrics-plot {
-  max-width: 100%;
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 4px;
+  &__plot {
+    max-width: 100%;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 4px;
+  }
 }
 </style>

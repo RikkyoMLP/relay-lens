@@ -13,10 +13,10 @@ onMounted(() => {
 
 <template>
   <el-container class="app-layout">
-    <el-aside width="300px" class="app-sidebar">
+    <el-aside width="300px" class="app-layout__sidebar">
       <SidebarPanel />
     </el-aside>
-    <el-main class="app-main">
+    <el-main class="app-layout__main">
       <MainPanel />
     </el-main>
   </el-container>
@@ -25,17 +25,17 @@ onMounted(() => {
 <style lang="scss" scoped>
 .app-layout {
   height: 100vh;
-}
 
-.app-sidebar {
-  border-right: 1px solid var(--el-border-color);
-  overflow-y: auto;
-  padding: 16px;
-  background: var(--el-bg-color-page);
-}
+  &__sidebar {
+    border-right: 1px solid var(--el-border-color);
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--el-bg-color-page);
+  }
 
-.app-main {
-  overflow-y: auto;
-  padding: 16px;
+  &__main {
+    overflow-y: auto;
+    padding: 16px;
+  }
 }
 </style>

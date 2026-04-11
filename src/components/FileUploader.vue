@@ -45,13 +45,13 @@ async function scanLocal() {
       :on-remove="handleRemove"
       :show-file-list="true"
     >
-      <div class="upload-hint">
+      <div class="file-uploader__hint">
         <p>Drop .mat files here</p>
-        <p class="upload-hint-sub">or click to browse</p>
+        <p class="file-uploader__hint--sub">or click to browse</p>
       </div>
     </el-upload>
 
-    <div class="upload-actions">
+    <div class="file-uploader__actions">
       <el-button
         type="primary"
         size="small"
@@ -67,24 +67,26 @@ async function scanLocal() {
 </template>
 
 <style lang="scss" scoped>
-.upload-hint {
-  padding: 8px 0;
+.file-uploader {
+  &__hint {
+    padding: 8px 0;
 
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--el-text-color-regular);
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--el-text-color-regular);
+    }
+
+    &--sub {
+      font-size: 12px;
+      color: var(--el-text-color-placeholder);
+    }
   }
 
-  .upload-hint-sub {
-    font-size: 12px;
-    color: var(--el-text-color-placeholder);
+  &__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
   }
-}
-
-.upload-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
 }
 </style>

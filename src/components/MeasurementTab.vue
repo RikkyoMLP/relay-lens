@@ -56,13 +56,13 @@ async function handleUploadMask(uploadFile: UploadFile) {
   <div>
     <!-- Mask controls -->
     <div class="mask-controls">
-      <div class="mask-status">
+      <div class="mask-controls__status">
         <el-tag v-if="vizStore.maskStatus.loaded" type="success" effect="plain">
           Mask: {{ vizStore.maskStatus.filename }} ({{ vizStore.maskStatus.shape?.join(" x ") }})
         </el-tag>
         <el-tag v-else type="info" effect="plain">No mask loaded</el-tag>
       </div>
-      <div class="mask-actions">
+      <div class="mask-controls__actions">
         <el-button size="small" :loading="scanning" @click="handleScanMask"> Scan Mask </el-button>
         <el-upload
           accept=".mat"
@@ -76,21 +76,21 @@ async function handleUploadMask(uploadFile: UploadFile) {
     </div>
 
     <!-- Empty states -->
-    <div v-if="!vizStore.maskStatus.loaded" class="empty-state">
+    <div v-if="!vizStore.maskStatus.loaded" class="py-12">
       <el-empty description="Load a mask file to compute CASSI measurements" :image-size="64" />
     </div>
 
-    <div v-else-if="!fileStore.selectedKey" class="empty-state">
+    <div v-else-if="!fileStore.selectedKey" class="py-12">
       <el-empty description="Select a key from the toolbar" :image-size="64" />
     </div>
 
-    <div v-else-if="sections.length === 0" class="empty-state">
+    <div v-else-if="sections.length === 0" class="py-12">
       <el-empty description="No HSI data for the selected key" :image-size="64" />
     </div>
 
     <!-- Measurement images -->
     <div v-else>
-      <div v-for="section in sections" :key="section!.file.fileId" class="file-block">
+      <div v-for="section in sections" :key="section!.file.fileId" class="mb-6">
         <SceneGrid :image-urls="section!.urls" :label="`${section!.file.filename} - Measurement`" />
       </div>
     </div>
@@ -105,19 +105,11 @@ async function handleUploadMask(uploadFile: UploadFile) {
   margin-bottom: 12px;
   padding: 8px 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
-}
 
-.mask-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.empty-state {
-  padding: 48px 0;
-}
-
-.file-block {
-  margin-bottom: 24px;
+  &__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
 }
 </style>

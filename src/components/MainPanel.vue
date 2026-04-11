@@ -15,7 +15,7 @@ const vizStore = useVizStore();
   <div class="main-panel">
     <VizToolbar />
 
-    <el-tabs v-model="vizStore.activeTab" class="viz-tabs">
+    <el-tabs v-model="vizStore.activeTab" class="main-panel__tabs">
       <el-tab-pane label="RGB" name="rgb">
         <RgbTab />
       </el-tab-pane>
@@ -43,15 +43,15 @@ const vizStore = useVizStore();
   height: 100%;
   display: flex;
   flex-direction: column;
-}
 
-.viz-tabs {
-  flex: 1;
-  overflow: hidden;
+  &__tabs {
+    flex: 1;
+    overflow: hidden;
 
-  :deep(.el-tabs__content) {
-    overflow-y: auto;
-    height: calc(100% - 40px);
+    :deep(.el-tabs__content) {
+      overflow-y: auto;
+      height: calc(100% - 40px);
+    }
   }
 }
 </style>
