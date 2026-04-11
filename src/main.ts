@@ -6,6 +6,7 @@ import "element-plus/dist/index.css";
 import App from "./App.vue";
 import "./styles/global.scss";
 import "uno.css";
+import "./styles/theme.scss";
 
 // Only apply in development
 // if (import.meta.hot) {
