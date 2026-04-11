@@ -8,6 +8,13 @@ import UnoCSS from "unocss/vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const defaultProxySettings = {
+  "/api": {
+    target: "http://localhost:7860",
+    changeOrigin: true,
+  },
+}
+
 export default defineConfig({
   plugins: [vue(), DevTools(), VueTracer(), UnoCSS()],
   resolve: {
@@ -16,22 +23,12 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:7860",
-        changeOrigin: true,
-      },
-    },
+    proxy: defaultProxySettings,
+  },
+  preview: {
+    proxy: defaultProxySettings,
   },
   build: {
     chunkSizeWarningLimit: 1000,
-  },
-  preview: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:7860",
-        changeOrigin: true,
-      },
-    },
   },
 });
