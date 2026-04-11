@@ -16,6 +16,9 @@ on:
       - "*.config.ts"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   sync:
     runs-on: ubuntu-latest

@@ -30,7 +30,7 @@ if DIST_DIR.exists():
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
         """SPA fallback: serve index.html for any non-API, non-asset path."""
-        file_path = DIST_DIR / full_path
-        if file_path.is_file():
+        file_path = (DIST_DIR / full_path).resolve()
+        if file_path.is_relative_to(DIST_DIR) and file_path.is_file():
             return FileResponse(file_path)
         return FileResponse(DIST_DIR / "index.html")
