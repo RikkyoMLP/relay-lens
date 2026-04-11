@@ -13,7 +13,7 @@ from hsi_utils.rendering import (
     InsetPosition,
     render_measurement,
 )
-from hsi_utils.rendering._wavelength_data import WAVELENGTHS_28
+from hsi_utils.rendering._wavelength_data import get_wavelengths
 from hsi_utils.plotting import draw_plot, PlotInput, draw_spectral_density, SpectralInput
 
 
@@ -51,13 +51,14 @@ def get_scene(data: np.ndarray, scene: int) -> np.ndarray:
 
 def render_rgb(cube: np.ndarray) -> Image.Image:
     """HSI cube (H, W, C) -> RGB image."""
-    rgb = hsi_to_rgb(cube)
+    wavelengths = get_wavelengths(cube.shape[2])
+    rgb = hsi_to_rgb(cube, wavelengths=wavelengths)
     return Image.fromarray(rgb)
 
 
 def render_colorized(cube: np.ndarray, channel: int) -> Image.Image:
     """Single channel pseudo-colored by its wavelength."""
-    wl = float(WAVELENGTHS_28[channel])
+    wl = float(get_wavelengths(cube.shape[2])[channel])
     colored = colorize_channel(np.clip(cube[:, :, channel], 0, 1), wl)
     return Image.fromarray(colored)
 
@@ -66,8 +67,9 @@ def render_rgb_error_map(
     pred: np.ndarray, truth: np.ndarray, scale: float = 5.0
 ) -> Image.Image:
     """RGB error map: |rgb(pred) - rgb(truth)| * scale."""
-    rgb_pred = hsi_to_rgb(pred).astype(np.float64)
-    rgb_truth = hsi_to_rgb(truth).astype(np.float64)
+    wavelengths = get_wavelengths(pred.shape[2])
+    rgb_pred = hsi_to_rgb(pred, wavelengths=wavelengths).astype(np.float64)
+    rgb_truth = hsi_to_rgb(truth, wavelengths=wavelengths).astype(np.float64)
     diff = np.abs(rgb_pred - rgb_truth) * scale
     return Image.fromarray(np.clip(np.round(diff), 0, 255).astype(np.uint8))
 
@@ -76,7 +78,7 @@ def render_channel_error_map(
     pred: np.ndarray, truth: np.ndarray, channel: int, scale: float = 5.0
 ) -> Image.Image:
     """Per-channel colorized error map."""
-    wl = float(WAVELENGTHS_28[channel])
+    wl = float(get_wavelengths(pred.shape[2])[channel])
     pred_c = colorize_channel(np.clip(pred[:, :, channel], 0, 1), wl)
     truth_c = colorize_channel(np.clip(truth[:, :, channel], 0, 1), wl)
     diff = np.abs(pred_c.astype(np.float64) - truth_c.astype(np.float64)) * scale
@@ -90,7 +92,7 @@ def render_magnified(
     position: InsetPosition = InsetPosition.BOTTOM_RIGHT,
 ) -> Image.Image:
     """Colorized channel with magnified ROI inset overlay."""
-    wl = float(WAVELENGTHS_28[channel])
+    wl = float(get_wavelengths(cube.shape[2])[channel])
     colored = colorize_channel(np.clip(cube[:, :, channel], 0, 1), wl)
     result = draw_magnified_inset(colored, roi, inset_position=position)
     return Image.fromarray(result)
