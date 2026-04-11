@@ -128,7 +128,7 @@ async def viz_spectral_density(
         inputs.append(SpectralInput(
             cube=cube,
             label=s.get("label", f"{s['key']}"),
-            is_gt=s.get("is_gt", False),
+            is_ground_truth=s.get("is_ground_truth", False),
         ))
 
     roi = (roi_x, roi_y, roi_w, roi_h)

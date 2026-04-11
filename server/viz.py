@@ -17,17 +17,36 @@ from hsi_utils.rendering._wavelength_data import WAVELENGTHS_28
 from hsi_utils.plotting import draw_plot, PlotInput, draw_spectral_density, SpectralInput
 
 
+def _normalize_cube(cube: np.ndarray, original_dtype: np.dtype) -> np.ndarray:
+    """Normalize cube values to [0, 1] if not already in range.
+
+    Integer dtypes: divide by dtype max (e.g. uint16 -> /65535).
+    Float dtypes outside [0, 1]: divide by data max.
+    Then clip to [0, 1].
+    """
+    if np.issubdtype(original_dtype, np.integer):
+        cube = cube / np.float64(np.iinfo(original_dtype).max)
+    elif cube.max() > 1.0 or cube.min() < 0.0:
+        max_val = cube.max()
+        if max_val > 0:
+            cube = cube / max_val
+    return np.clip(cube, 0.0, 1.0)
+
+
 def get_scene(data: np.ndarray, scene: int) -> np.ndarray:
     """Extract a single scene (H, W, C) from possibly batched data."""
+    original_dtype = data.dtype
     if data.ndim == 4:
         if scene < 0 or scene >= data.shape[0]:
             raise IndexError(f"Scene {scene} out of range [0, {data.shape[0]})")
-        return data[scene].astype(np.float64)
-    if data.ndim == 3:
+        cube = data[scene].astype(np.float64)
+    elif data.ndim == 3:
         if scene != 0:
             raise IndexError(f"Single cube has no scene index {scene}")
-        return data.astype(np.float64)
-    raise ValueError(f"Expected 3D or 4D array, got {data.ndim}D")
+        cube = data.astype(np.float64)
+    else:
+        raise ValueError(f"Expected 3D or 4D array, got {data.ndim}D")
+    return _normalize_cube(cube, original_dtype)
 
 
 def render_rgb(cube: np.ndarray) -> Image.Image:

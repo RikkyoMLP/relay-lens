@@ -7,7 +7,7 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently -n frontend,backend -c cyan,green \"vite --open\" \"uv run uvicorn server.app:app --host 0.0.0.0 --port 7860\"",
+    "dev": "concurrently -n frontend,backend -c cyan,green \"vite --open\" \"uv run uvicorn server.app:app --host 0.0.0.0 --port 7860 --reload\"",
     "build": "vite build",
     "preview": "concurrently -n frontend,backend -c cyan,green \"vite preview\" \"uv run uvicorn server.app:app --host 0.0.0.0 --port 7860\"",
     "lint": "oxlint src/",
