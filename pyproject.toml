@@ -17,5 +17,11 @@ members = ["hsi-utils"]
 [tool.uv.sources]
 hsi-utils = { workspace = true }
 
+[dependency-groups]
+dev = [
+    "torch>=2.11.0",
+    "tqdm>=4.67.3",
+]
+
 [tool.uv]
 config-settings-package = { "hsi-utils" = { editable_mode = "compat" } }
