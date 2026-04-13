@@ -7,12 +7,14 @@ import MagnifiedTab from "./MagnifiedTab.vue";
 import MetricsTab from "./MetricsTab.vue";
 import SpectralDensityTab from "./SpectralDensityTab.vue";
 import MeasurementTab from "./MeasurementTab.vue";
+import GithubLink from "./GithubLink.vue";
 
 const vizStore = useVizStore();
 </script>
 
 <template>
   <div class="main-panel">
+    <GithubLink />
     <VizToolbar />
 
     <el-tabs v-model="vizStore.activeTab" class="main-panel__tabs">
