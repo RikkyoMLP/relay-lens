@@ -2,7 +2,6 @@ import { defineConfig, presetIcons, transformerDirectives, transformerVariantGro
 import presetWind3 from "@unocss/preset-wind3";
 
 export default defineConfig({
-  safelist: ["i-mdi-github"],
   rules: [],
   presets: [
     presetWind3(),
