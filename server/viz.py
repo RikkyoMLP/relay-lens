@@ -1,6 +1,4 @@
 """Visualization functions wrapping hsi-utils.
-
-Pure functions: numpy in, PIL Image out. No state, no side effects.
 """
 
 import numpy as np
@@ -36,11 +34,14 @@ def _normalize_cube(cube: np.ndarray, original_dtype: np.dtype) -> np.ndarray:
 def get_scene(data: np.ndarray, scene: int) -> np.ndarray:
     """Extract a single scene (H, W, C) from possibly batched data."""
     original_dtype = data.dtype
-    if data.ndim == 4:
+    # One data cube might contain more than one scenes
+    # For 3-dimensional cube: (H, W, C), single scene, scene must be 0
+    # For 4-dimensional cube: (N, H, W, C), index by scene along axis 0
+    if data.ndim == 4:  # data cube contains multiple scenes
         if scene < 0 or scene >= data.shape[0]:
             raise IndexError(f"Scene {scene} out of range [0, {data.shape[0]})")
         cube = data[scene].astype(np.float64)
-    elif data.ndim == 3:
+    elif data.ndim == 3:  # data cube contains only one scene
         if scene != 0:
             raise IndexError(f"Single cube has no scene index {scene}")
         cube = data.astype(np.float64)

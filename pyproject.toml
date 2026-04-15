@@ -23,5 +23,12 @@ dev = [
     "tqdm>=4.67.3",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
+
 [tool.uv]
 config-settings-package = { "hsi-utils" = { editable_mode = "compat" } }
