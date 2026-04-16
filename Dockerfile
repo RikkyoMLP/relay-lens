@@ -19,7 +19,7 @@ COPY src/ src/
 RUN pnpm build
 
 # -- Python deps --
-COPY pyproject.toml uv.lock .python-version ./
+COPY pyproject.toml uv.lock .python-version README.md ./
 COPY hsi-utils/ hsi-utils/
 
 RUN pip install --no-cache-dir uv && \
