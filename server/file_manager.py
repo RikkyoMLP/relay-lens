@@ -129,9 +129,13 @@ class FileManager:
     def list_files(self) -> list[FileEntry]:
         return list(self._files.values())
 
-    def remove_file(self, file_id: str) -> None:
+    def remove_file(self, file_id: str, delete_from_disk: bool = True) -> None:
+        entry = self._files[file_id]
         self._cache.evict_file(file_id)
         del self._files[file_id]
+        # deletion should be restricted to uploaded files only
+        if delete_from_disk and entry.path.resolve().is_relative_to(INPUT_DIR.resolve()):
+            entry.path.unlink(missing_ok=True)
 
     def load_key(self, file_id: str, key_name: str) -> np.ndarray:
         """Load a specific key from a .mat file, with LRU caching."""
