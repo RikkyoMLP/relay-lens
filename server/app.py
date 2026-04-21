@@ -17,6 +17,7 @@ app.add_middleware(
     allow_origins=["http://localhost:5173", "http://localhost:4173"],
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Session-ID"],
 )
 
 app.include_router(files_router, prefix="/api/files", tags=["files"])

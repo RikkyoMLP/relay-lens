@@ -8,6 +8,7 @@ node_modules/
 [Mm]ask*/
 test_input/
 test_output/
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

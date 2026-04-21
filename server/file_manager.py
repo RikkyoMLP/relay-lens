@@ -4,10 +4,12 @@ Key design decisions:
 - whosmat() for metadata: reads shape/dtype without loading data (<1ms)
 - loadmat(variable_names=[key]) for on-demand loading: only loads requested key
 - LRU cache with max entries to bound memory usage
+- Per-session isolation: each browser session gets its own FileManager
+  with separate upload directories under data/<session_id>/
 """
 
+import re
 import uuid
-import shutil
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -16,8 +18,20 @@ import numpy as np
 import scipy.io as sio
 
 
-INPUT_DIR = Path(__file__).resolve().parent.parent / "input"
-MASK_DIR = Path(__file__).resolve().parent.parent / "mask"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Global dirs for pre-existing local files (development convenience)
+GLOBAL_INPUT_DIR = PROJECT_ROOT / "input"
+GLOBAL_MASK_DIR = PROJECT_ROOT / "mask"
+# Per-session data lives here
+DATA_ROOT = PROJECT_ROOT / "data"
+
+_SESSION_ID_RE = re.compile(r"^[a-f0-9\-]{36}$")
+
+
+def _validate_session_id(session_id: str) -> None:
+    """Reject anything that isn't a UUID to prevent path traversal."""
+    if not _SESSION_ID_RE.match(session_id):
+        raise ValueError(f"Invalid session ID: {session_id}")
 
 
 def classify_key(shape: tuple[int, ...]) -> str:
@@ -79,9 +93,14 @@ class DataCache:
 
 
 class FileManager:
-    """Manages .mat file registration, metadata scanning, and lazy data loading."""
+    """Manages .mat file registration, metadata scanning, and lazy data loading.
 
-    def __init__(self):
+    Each instance is scoped to a session with its own upload directories.
+    """
+
+    def __init__(self, input_dir: Path, mask_dir: Path):
+        self._input_dir = input_dir
+        self._mask_dir = mask_dir
         self._files: dict[str, FileEntry] = {}
         self._cache = DataCache()
         self._mask: np.ndarray | None = None
@@ -106,18 +125,19 @@ class FileManager:
         return entry
 
     def scan_local_dir(self) -> list[FileEntry]:
-        """Scan the input/ directory for .mat files."""
-        if not INPUT_DIR.exists():
-            return []
+        """Scan both global input/ and session input/ directories for .mat files."""
         results = []
-        for p in sorted(INPUT_DIR.glob("*.mat")):
-            results.append(self.scan_file(p))
+        for d in (GLOBAL_INPUT_DIR, self._input_dir):
+            if not d.exists():
+                continue
+            for p in sorted(d.glob("*.mat")):
+                results.append(self.scan_file(p))
         return results
 
     def save_uploaded(self, filename: str, content: bytes) -> Path:
-        """Save an uploaded file to the input/ directory."""
-        INPUT_DIR.mkdir(exist_ok=True)
-        dest = INPUT_DIR / filename
+        """Save an uploaded file to the session input/ directory."""
+        self._input_dir.mkdir(parents=True, exist_ok=True)
+        dest = self._input_dir / filename
         dest.write_bytes(content)
         return dest
 
@@ -133,8 +153,8 @@ class FileManager:
         entry = self._files[file_id]
         self._cache.evict_file(file_id)
         del self._files[file_id]
-        # deletion should be restricted to uploaded files only
-        if delete_from_disk and entry.path.resolve().is_relative_to(INPUT_DIR.resolve()):
+        # Only delete files inside the session upload dir, not global ones
+        if delete_from_disk and entry.path.resolve().is_relative_to(self._input_dir.resolve()):
             entry.path.unlink(missing_ok=True)
 
     def load_key(self, file_id: str, key_name: str) -> np.ndarray:
@@ -206,18 +226,19 @@ class FileManager:
         self._mask_filename = path.name
 
     def scan_mask_dir(self) -> bool:
-        """Scan mask/ directory and load the first .mat file found."""
-        if not MASK_DIR.exists():
-            return False
-        for p in sorted(MASK_DIR.glob("*.mat")):
-            self.load_mask_file(p)
-            return True
+        """Scan both global mask/ and session mask/ for a .mat file."""
+        for d in (GLOBAL_MASK_DIR, self._mask_dir):
+            if not d.exists():
+                continue
+            for p in sorted(d.glob("*.mat")):
+                self.load_mask_file(p)
+                return True
         return False
 
     def save_uploaded_mask(self, filename: str, content: bytes) -> None:
         """Save and load an uploaded mask file."""
-        MASK_DIR.mkdir(exist_ok=True)
-        dest = MASK_DIR / filename
+        self._mask_dir.mkdir(parents=True, exist_ok=True)
+        dest = self._mask_dir / filename
         dest.write_bytes(content)
         self.load_mask_file(dest)
 
@@ -238,5 +259,18 @@ class FileManager:
         }
 
 
-# Module-level singleton
-file_manager = FileManager()
+# -- Session registry --
+
+_sessions: dict[str, FileManager] = {}
+
+
+def get_session_manager(session_id: str) -> FileManager:
+    """Return the FileManager for a given session, creating one if needed."""
+    _validate_session_id(session_id)
+    if session_id not in _sessions:
+        session_dir = DATA_ROOT / session_id
+        _sessions[session_id] = FileManager(
+            input_dir=session_dir / "input",
+            mask_dir=session_dir / "mask",
+        )
+    return _sessions[session_id]

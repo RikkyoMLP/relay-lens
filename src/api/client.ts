@@ -3,6 +3,8 @@
  * Plain fetch wrappers - no external HTTP library needed.
  */
 
+import { getSessionId } from "@/utils/sessionId";
+
 const BASE = "/api";
 
 // -- Types --
@@ -20,54 +22,72 @@ export interface FileEntry {
   keys: KeyInfo[];
 }
 
+// -- Session header helper --
+
+function sessionHeaders(): Record<string, string> {
+  return { "X-Session-ID": getSessionId() };
+}
+
 // -- File Management --
 
 export async function uploadFiles(files: File[]): Promise<FileEntry[]> {
   const form = new FormData();
   for (const f of files) form.append("files", f);
-  const res = await fetch(`${BASE}/files/upload`, { method: "POST", body: form });
+  const res = await fetch(`${BASE}/files/upload`, {
+    method: "POST",
+    body: form,
+    headers: sessionHeaders(),
+  });
   if (!res.ok) throw new Error(`Upload failed: ${res.statusText}`);
   const data = await res.json();
   return data.files;
 }
 
 export async function scanLocalFiles(): Promise<FileEntry[]> {
-  const res = await fetch(`${BASE}/files/scan-local`, { method: "POST" });
+  const res = await fetch(`${BASE}/files/scan-local`, {
+    method: "POST",
+    headers: sessionHeaders(),
+  });
   if (!res.ok) throw new Error(`Scan failed: ${res.statusText}`);
   const data = await res.json();
   return data.files;
 }
 
 export async function getFiles(): Promise<FileEntry[]> {
-  const res = await fetch(`${BASE}/files`);
+  const res = await fetch(`${BASE}/files`, { headers: sessionHeaders() });
   if (!res.ok) throw new Error(`List failed: ${res.statusText}`);
   const data = await res.json();
   return data.files;
 }
 
 export async function getCommonKeys(): Promise<KeyInfo[]> {
-  const res = await fetch(`${BASE}/files/common-keys`);
+  const res = await fetch(`${BASE}/files/common-keys`, { headers: sessionHeaders() });
   if (!res.ok) throw new Error(`Common keys failed: ${res.statusText}`);
   const data = await res.json();
   return data.commonKeys;
 }
 
 export async function getFileInfo(fileId: string): Promise<unknown> {
-  const res = await fetch(`${BASE}/files/${fileId}/info`);
+  const res = await fetch(`${BASE}/files/${fileId}/info`, { headers: sessionHeaders() });
   if (!res.ok) throw new Error(`File info failed: ${res.statusText}`);
   const data = await res.json();
   return data.structure;
 }
 
 export async function deleteFile(fileId: string): Promise<void> {
-  const res = await fetch(`${BASE}/files/${fileId}`, { method: "DELETE" });
+  const res = await fetch(`${BASE}/files/${fileId}`, {
+    method: "DELETE",
+    headers: sessionHeaders(),
+  });
   if (!res.ok) throw new Error(`Delete failed: ${res.statusText}`);
 }
 
 // -- Visualization URL builders --
+// Viz endpoints use query param (not header) because <img src> can't set headers.
 
 export function vizUrl(type: string, params: Record<string, string | number>): string {
   const query = new URLSearchParams();
+  query.set("session_id", getSessionId());
   for (const [k, v] of Object.entries(params)) {
     query.set(k, String(v));
   }
@@ -108,19 +128,26 @@ export interface MaskStatus {
 export async function uploadMask(file: File): Promise<MaskStatus> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${BASE}/files/upload-mask`, { method: "POST", body: form });
+  const res = await fetch(`${BASE}/files/upload-mask`, {
+    method: "POST",
+    body: form,
+    headers: sessionHeaders(),
+  });
   if (!res.ok) throw new Error(`Mask upload failed: ${res.statusText}`);
   return res.json();
 }
 
 export async function scanMask(): Promise<MaskStatus> {
-  const res = await fetch(`${BASE}/files/scan-mask`, { method: "POST" });
+  const res = await fetch(`${BASE}/files/scan-mask`, {
+    method: "POST",
+    headers: sessionHeaders(),
+  });
   if (!res.ok) throw new Error(`Mask scan failed: ${res.statusText}`);
   return res.json();
 }
 
 export async function getMaskStatus(): Promise<MaskStatus> {
-  const res = await fetch(`${BASE}/files/mask-status`);
+  const res = await fetch(`${BASE}/files/mask-status`, { headers: sessionHeaders() });
   if (!res.ok) throw new Error(`Mask status failed: ${res.statusText}`);
   return res.json();
 }
