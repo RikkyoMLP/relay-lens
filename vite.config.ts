@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { DevTools } from "@vitejs/devtools";
+import legacy from "@vitejs/plugin-legacy";
 import { VueTracer } from "vite-plugin-vue-tracer";
 import UnoCSS from "unocss/vite";
 
@@ -13,10 +14,18 @@ const defaultProxySettings = {
     target: "http://localhost:7860",
     changeOrigin: true,
   },
-}
+};
 
 export default defineConfig({
-  plugins: [vue(), DevTools(), VueTracer(), UnoCSS()],
+  plugins: [
+    vue(),
+    DevTools(),
+    VueTracer(),
+    UnoCSS(),
+    legacy({
+      targets: ["defaults", "not IE 11"],
+    }),
+  ],
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
