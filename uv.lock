@@ -350,6 +350,7 @@ dependencies = [
     { name = "rich" },
     { name = "scipy" },
     { name = "torch" },
+    { name = "tqdm" },
 ]
 
 [package.optional-dependencies]
@@ -368,6 +369,7 @@ requires-dist = [
     { name = "rich", specifier = ">=14.2.0" },
     { name = "scipy", specifier = ">=1.16.2" },
     { name = "torch", specifier = ">=2.11.0" },
+    { name = "tqdm", specifier = ">=4.67.3" },
 ]
 provides-extras = ["metrics"]
 
