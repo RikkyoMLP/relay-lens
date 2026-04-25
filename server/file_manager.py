@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
-import scipy.io as sio
+from hsi_utils.datasets.io import loadmat, whosmat
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -113,9 +113,8 @@ class FileManager:
             if entry.path.resolve() == path.resolve():
                 return entry
 
-        entries = sio.whosmat(str(path))
         keys = []
-        for name, shape, dtype in entries:
+        for name, shape, dtype in whosmat(path):
             data_type = classify_key(shape)
             keys.append(KeyInfo(name=name, shape=shape, dtype=str(dtype), data_type=data_type))
 
@@ -165,10 +164,10 @@ class FileManager:
             return cached
 
         entry = self.get_file(file_id)
-        mat = sio.loadmat(str(entry.path), variable_names=[key_name])
+        mat = loadmat(str(entry.path), variable_names=[key_name])
         if key_name not in mat:
             raise KeyError(f"Key '{key_name}' not found in {entry.filename}")
-        data = mat[key_name]
+        data = np.asarray(mat[key_name])
         self._cache.put(cache_key, data)
         return data
 
@@ -206,7 +205,7 @@ class FileManager:
 
         If key is None, auto-detect the first 2D array.
         """
-        mat = sio.loadmat(str(path))
+        mat = loadmat(str(path))
         if key:
             if key not in mat:
                 raise KeyError(f"Key '{key}' not found in {path.name}")
