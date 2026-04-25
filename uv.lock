@@ -349,12 +349,12 @@ dependencies = [
     { name = "pillow" },
     { name = "rich" },
     { name = "scipy" },
+    { name = "torch" },
 ]
 
 [package.optional-dependencies]
 metrics = [
     { name = "lpips" },
-    { name = "torch" },
 ]
 
 [package.metadata]
@@ -367,7 +367,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=12.0.0" },
     { name = "rich", specifier = ">=14.2.0" },
     { name = "scipy", specifier = ">=1.16.2" },
-    { name = "torch", marker = "extra == 'metrics'" },
+    { name = "torch", specifier = ">=2.11.0" },
 ]
 provides-extras = ["metrics"]
 
