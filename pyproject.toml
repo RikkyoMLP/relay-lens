@@ -32,3 +32,7 @@ packages = ["server"]
 
 [tool.uv]
 config-settings-package = { "hsi-utils" = { editable_mode = "compat" } }
+
+[tool.ty.environment]
+python = ".venv"
+root = ["./server"]
