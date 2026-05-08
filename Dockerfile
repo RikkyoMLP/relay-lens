@@ -12,7 +12,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # -- Frontend build --
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY index.html tsconfig.json vite.config.ts ./
