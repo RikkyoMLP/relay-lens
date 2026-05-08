@@ -168,3 +168,19 @@ async def viz_measurement(
     img = viz.compute_measurement(cube, mask)
     return _image_response(img)
 
+
+@router.get("/grayscale")
+async def viz_grayscale(
+    file_id: str, key: str,
+    fm: FileManager = Depends(_get_fm),
+):
+    """Render a 2D array as a grayscale image."""
+    try:
+        data = fm.load_key(file_id, key)
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+    if data.ndim != 2:
+        raise HTTPException(400, f"Expected 2D array, got {data.ndim}D")
+    img = viz.render_grayscale(data)
+    return _image_response(img)
+

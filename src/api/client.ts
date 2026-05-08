@@ -111,7 +111,7 @@ export function dataTypeLabel(dt: string): string {
     hsi_cube_batch: "HSI",
     hsi_cube: "HSI",
     metric_array: "1D",
-    image_2d: "2D",
+    image_2d: "Gray",
     unknown: "?",
   };
   return labels[dt] ?? dt;

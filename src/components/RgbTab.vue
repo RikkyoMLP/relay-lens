@@ -14,6 +14,13 @@ const sections = computed(() => {
     .map((file) => {
       const keyInfo = file.keys.find((k) => k.name === key);
       if (!keyInfo) return null;
+
+      // Handle 2D grayscale images
+      if (keyInfo.dataType === "image_2d") {
+        const grayUrl = vizUrl("grayscale", { file_id: file.fileId, key });
+        return { file, rgbUrls: [grayUrl], errorUrls: [], isGrayscale: true };
+      }
+
       const count = getSceneCount(keyInfo);
       if (count === 0) return null;
 
@@ -36,7 +43,7 @@ const sections = computed(() => {
         );
       }
 
-      return { file, rgbUrls, errorUrls };
+      return { file, rgbUrls, errorUrls, isGrayscale: false };
     })
     .filter(Boolean);
 });
@@ -48,12 +55,15 @@ const sections = computed(() => {
   </div>
 
   <div v-else-if="sections.length === 0" class="py-12">
-    <el-empty description="No HSI data for the selected key" :image-size="64" />
+    <el-empty description="No visualizable data for the selected key" :image-size="64" />
   </div>
 
   <div v-else>
     <div v-for="section in sections" :key="section!.file.fileId" class="mb-6">
-      <SceneGrid :image-urls="section!.rgbUrls" :label="`${section!.file.filename} - RGB`" />
+      <SceneGrid
+        :image-urls="section!.rgbUrls"
+        :label="`${section!.file.filename} - ${section!.isGrayscale ? 'Grayscale' : 'RGB'}`"
+      />
 
       <SceneGrid
         v-if="section!.errorUrls.length > 0"

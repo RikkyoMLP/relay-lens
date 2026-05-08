@@ -165,3 +165,15 @@ def compute_measurement(
 
     gray = render_measurement(meas)
     return Image.fromarray(gray)
+
+
+def render_grayscale(data: np.ndarray) -> Image.Image:
+    """Render a 2D array as a grayscale image."""
+    arr = data.astype(np.float64)
+    lo, hi = arr.min(), arr.max()
+    if hi > lo:
+        arr = (arr - lo) / (hi - lo)
+    else:
+        arr = np.zeros_like(arr)
+    gray = np.clip(np.round(arr * 255), 0, 255).astype(np.uint8)
+    return Image.fromarray(gray, mode="L")
