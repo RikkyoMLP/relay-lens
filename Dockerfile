@@ -1,11 +1,12 @@
 FROM python:3.12-slim AS base
 
 # Install Node.js 24 for frontend build
+# TODO: migrate to bun
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl ca-certificates && \
     curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
-    npm install -g pnpm@10 && \
+    npm install -g pnpm && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
