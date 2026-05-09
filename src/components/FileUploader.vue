@@ -1,31 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useFileStore } from "@/stores/fileStore";
-import type { UploadFile } from "element-plus";
+import type { UploadFile, UploadInstance } from "element-plus";
 
 const fileStore = useFileStore();
-const pendingFiles = ref<File[]>([]);
+const uploadRef = ref<UploadInstance>();
 const uploading = ref(false);
 
-function handleChange(uploadFile: UploadFile) {
-  if (uploadFile.raw) {
-    pendingFiles.value.push(uploadFile.raw);
-  }
-}
-
-function handleRemove(uploadFile: UploadFile) {
-  const idx = pendingFiles.value.findIndex((f) => f.name === uploadFile.name);
-  if (idx >= 0) pendingFiles.value.splice(idx, 1);
-}
-
-async function submitUpload() {
-  if (pendingFiles.value.length === 0) return;
+async function handleChange(uploadFile: UploadFile) {
+  if (!uploadFile.raw) return;
   uploading.value = true;
   try {
-    await fileStore.uploadFiles(pendingFiles.value);
-    pendingFiles.value = [];
+    await fileStore.uploadFiles([uploadFile.raw]);
   } finally {
     uploading.value = false;
+    uploadRef.value?.clearFiles();
   }
 }
 
@@ -37,30 +26,24 @@ async function scanLocal() {
 <template>
   <div class="file-uploader">
     <el-upload
+      ref="uploadRef"
       drag
       multiple
       accept=".mat"
       :auto-upload="false"
       :on-change="handleChange"
-      :on-remove="handleRemove"
-      :show-file-list="true"
+      :show-file-list="false"
     >
       <div class="file-uploader__hint">
-        <p>Drop .mat files here</p>
-        <p class="file-uploader__hint--sub">or click to browse</p>
+        <p v-if="uploading">Uploading...</p>
+        <template v-else>
+          <p>Drop .mat files here</p>
+          <p class="file-uploader__hint--sub">or click to browse</p>
+        </template>
       </div>
     </el-upload>
 
     <div class="file-uploader__actions">
-      <el-button
-        type="primary"
-        size="small"
-        :loading="uploading"
-        :disabled="pendingFiles.length === 0"
-        @click="submitUpload"
-      >
-        Upload ({{ pendingFiles.length }})
-      </el-button>
       <el-button size="small" @click="scanLocal"> Scan Local </el-button>
     </div>
   </div>
