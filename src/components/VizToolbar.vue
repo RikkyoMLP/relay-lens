@@ -7,10 +7,28 @@ import { dataTypeLabel, formatShape } from "@/api/client";
 const fileStore = useFileStore();
 const vizStore = useVizStore();
 
+// Mirror of hsi_utils WAVELENGTHS_28 / WAVELENGTHS_31
+const WAVELENGTHS: Record<number, number[]> = {
+  28: [
+    453.5, 457.5, 462, 466, 471.5, 476.5, 481.5, 487, 492.5, 498, 504, 510,
+    516, 522.5, 529.5, 536.5, 544, 551.5, 558.5, 567.5, 575.5, 584.5, 594.5,
+    604, 614.5, 625, 636.5, 648,
+  ],
+  31: Array.from({ length: 31 }, (_, i) => 400 + i * 10),
+};
+
 const channelCount = computed(() => {
   const key = fileStore.commonKeys.find((k) => k.name === fileStore.selectedKey);
   if (!key) return 28;
   return key.shape[key.shape.length - 1];
+});
+
+const channelLabels = computed(() => {
+  const n = channelCount.value;
+  const wl = WAVELENGTHS[n];
+  return Array.from({ length: n }, (_, i) =>
+    wl ? `ch${i + 1} (${wl[i]}nm)` : `ch${i}`,
+  );
 });
 </script>
 
@@ -52,9 +70,9 @@ const channelCount = computed(() => {
           collapse-tags
           collapse-tags-tooltip
           placeholder="Channels"
-          style="width: 180px"
+          style="width: 220px"
         >
-          <el-option v-for="i in channelCount" :key="i - 1" :label="`ch${i - 1}`" :value="i - 1" />
+          <el-option v-for="(label, i) in channelLabels" :key="i" :label="label" :value="i" />
         </el-select>
       </div>
 
