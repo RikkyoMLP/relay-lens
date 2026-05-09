@@ -1,30 +1,27 @@
 FROM python:3.12-slim AS base
 
-# Install Node.js 24 for frontend build
-# TODO: migrate to bun
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates && \
-    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
-    apt-get install -y --no-install-recommends nodejs && \
-    npm install -g pnpm && \
+    apt-get install -y --no-install-recommends curl ca-certificates unzip && \
+    curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # -- Frontend build --
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY index.html tsconfig.json vite.config.ts ./
 COPY src/ src/
-RUN pnpm build
+RUN bun run build
 
 # -- Python deps --
 COPY pyproject.toml uv.lock .python-version README.md ./
 COPY hsi-utils/ hsi-utils/
 
 RUN pip install --no-cache-dir uv && \
-    uv sync --no-dev --no-editable
+    uv sync --no-dev
 
 # -- App code --
 COPY server/ server/

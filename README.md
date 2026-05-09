@@ -51,15 +51,12 @@ Hyperspectral Image (HSI) reconstruction visualization tool.
 
 ### On local machine
 
-> [!WARNING]
-> Be sure to install a node version between 20.x and 24.x. This application is unlikely to support 25.x.
-
-1. Install [node](https://nodejs.org/en/download) and [python](https://www.python.org/downloads/) on your machine.
-2. Install [pnpm](https://pnpm.io/installation) and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your machine.
+1. Install [python](https://www.python.org/downloads/) on your machine.
+2. Install [bun](https://bun.com/docs/installation) and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your machine.
 3. Clone the repository.
-4. In the root directory, run `pnpm i` to install frontend dependencies.
+4. In the root directory, run `bun install` to install frontend dependencies.
 5. Run `uv sync` to install backend dependencies.
-6. Run `pnpm dev` to start the application.
+6. Run `bun run dev` to start the application.
 
 The only difference between local and huggingface environment is that you can put `.mat` file(s) in the `input` folder to perform a quick local folder scan to automatically load all files.
 

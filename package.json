@@ -45,6 +45,5 @@
   "lint-staged": {
     "src/**/*.{ts,js,css,scss}": "oxfmt --write",
     "*.{html,json}": "oxfmt --write"
-  },
-  "packageManager": "pnpm@11.0.8"
+  }
 }
