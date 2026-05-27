@@ -44,22 +44,21 @@ Hyperspectral Image (HSI) reconstruction visualization tool.
 ### In a huggingface space
 
 1. Open [project huggingface space](https://huggingface.co/spaces/markchen9804/relay-lens).
-2. Click on the top-left stash area to select `.mat` files, or drag and drop `.mat` files into the stash area.
+2. Click on the top-left stash area to select `.mat` / `.exr` files, or drag and drop `.mat` / `.exr` files into the stash area.
 3. Click "Upload" button. Your file will not be used for any other purpose.
 4. On the left sidebar, select a key and start exploring.
 5. Switch between tabs to explore RGB, single-channel, metrics, spectral density (WIP), and upload additional `.mat` mask file to simulate a CASSI measurement image.
 
 ### On local machine
 
-1. Install [python](https://www.python.org/downloads/) on your machine.
-2. Install [bun](https://bun.com/docs/installation) and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your machine.
-3. Clone the repository.
-4. In the root directory, run `bun install` to install frontend dependencies.
-5. Run `uv sync` to install backend dependencies.
-6. Run `bun run dev` to start the application.
+1. Install [bun](https://bun.com/docs/installation) and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your machine.
+2. Clone the repository.
+3. In the root directory, run `bun install` to install frontend dependencies.
+4. In the root directory, run `uv sync` to install backend dependencies.
+5. In the root directory, run `bun run dev` to start the application.
 
-The only difference between local and huggingface environment is that you can put `.mat` file(s) in the `input` folder to perform a quick local folder scan to automatically load all files.
+The only difference between local and huggingface environment is that you can put `.mat` / `.exr` file(s) in the `input` folder to perform a quick local folder scan to automatically load all files.
 
 ## Local Development
 
-Please refer to [Usage on local machine](#on-local-machine) for detailed instructions. `relay-lens` requires Python 3.10+ and Node.js 20+.
+Please refer to [Usage on local machine](#on-local-machine) for detailed instructions.
