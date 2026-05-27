@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
-from hsi_utils.datasets.io import loadmat, whosmat
+from hsi_utils.datasets.io import loadmat, whosmat, loadexr, whosexr
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -34,13 +34,18 @@ def _validate_session_id(session_id: str) -> None:
         raise ValueError(f"Invalid session ID: {session_id}")
 
 
+SUPPORTED_EXTENSIONS = {".mat", ".exr"}
+
+
 def classify_key(shape: tuple[int, ...]) -> str:
-    """Classify a .mat key by its shape into a visualization type."""
+    """Classify a key by its shape into a visualization type."""
     ndim = len(shape)
     if ndim == 4 and shape[-1] in (28, 31):
         return "hsi_cube_batch"
     if ndim == 3 and shape[-1] in (28, 31):
         return "hsi_cube"
+    if ndim == 3 and shape[-1] == 3:
+        return "rgb_image"
     if ndim == 1 or (ndim == 2 and min(shape) == 1):
         return "metric_array"
     if ndim == 2 and shape[0] > 1 and shape[1] > 1:
@@ -93,9 +98,10 @@ class DataCache:
 
 
 class FileManager:
-    """Manages .mat file registration, metadata scanning, and lazy data loading.
+    """Manages HSI file registration, metadata scanning, and lazy data loading.
 
-    Each instance is scoped to a session with its own upload directories.
+    Supports .mat and .exr files. Each instance is scoped to a session with
+    its own upload directories.
     """
 
     def __init__(self, input_dir: Path, mask_dir: Path):
@@ -106,17 +112,51 @@ class FileManager:
         self._mask: np.ndarray | None = None
         self._mask_filename: str | None = None
 
-    def scan_file(self, path: Path) -> FileEntry:
-        """Register a .mat file: read metadata without loading data."""
-        # Check if already registered by path
-        for entry in self._files.values():
-            if entry.path.resolve() == path.resolve():
-                return entry
-
+    def _scan_mat(self, path: Path) -> list[KeyInfo]:
+        """Extract key metadata from a .mat file."""
         keys = []
         for name, shape, dtype in whosmat(path):
             data_type = classify_key(shape)
             keys.append(KeyInfo(name=name, shape=shape, dtype=str(dtype), data_type=data_type))
+        return keys
+
+    def _scan_exr(self, path: Path) -> list[KeyInfo]:
+        """Extract key metadata from an .exr file.
+
+        EXR files contain raw channels (R, G, B, w420nm, ...).  loadexr()
+        synthesises convenience keys "rgb" (H,W,3) and "cube" (H,W,C).
+        We expose only these synthesised keys since they map directly to
+        the existing visualization pipeline.
+        """
+        channels = whosexr(path)
+        if not channels:
+            return []
+        h, w = channels[0][1]
+
+        keys = []
+        # Check for RGB
+        ch_names = {name for name, _, _ in channels}
+        if {"R", "G", "B"} <= ch_names:
+            keys.append(KeyInfo(name="rgb", shape=(h, w, 3), dtype="float32", data_type="rgb_image"))
+
+        # Check for spectral cube (31-band KAIST convention)
+        spectral_count = sum(1 for n in ch_names if n.startswith("w") and n.endswith("nm"))
+        if spectral_count == 31:
+            keys.append(KeyInfo(name="cube", shape=(h, w, 31), dtype="float32", data_type="hsi_cube"))
+
+        return keys
+
+    def scan_file(self, path: Path) -> FileEntry:
+        """Register a data file: read metadata without loading data."""
+        for entry in self._files.values():
+            if entry.path.resolve() == path.resolve():
+                return entry
+
+        ext = path.suffix.lower()
+        if ext == ".exr":
+            keys = self._scan_exr(path)
+        else:
+            keys = self._scan_mat(path)
 
         file_id = uuid.uuid4().hex[:12]
         entry = FileEntry(file_id=file_id, filename=path.name, path=path, keys=keys)
@@ -124,13 +164,14 @@ class FileManager:
         return entry
 
     def scan_local_dir(self) -> list[FileEntry]:
-        """Scan both global input/ and session input/ directories for .mat files."""
+        """Scan both global input/ and session input/ directories for supported files."""
         results = []
         for d in (GLOBAL_INPUT_DIR, self._input_dir):
             if not d.exists():
                 continue
-            for p in sorted(d.glob("*.mat")):
-                results.append(self.scan_file(p))
+            for p in sorted(d.iterdir()):
+                if p.suffix.lower() in SUPPORTED_EXTENSIONS:
+                    results.append(self.scan_file(p))
         return results
 
     def save_uploaded(self, filename: str, content: bytes) -> Path:
@@ -157,17 +198,26 @@ class FileManager:
             entry.path.unlink(missing_ok=True)
 
     def load_key(self, file_id: str, key_name: str) -> np.ndarray:
-        """Load a specific key from a .mat file, with LRU caching."""
+        """Load a specific key from a data file, with LRU caching."""
         cache_key = f"{file_id}:{key_name}"
         cached = self._cache.get(cache_key)
         if cached is not None:
             return cached
 
         entry = self.get_file(file_id)
-        mat = loadmat(str(entry.path), variable_names=[key_name])
-        if key_name not in mat:
-            raise KeyError(f"Key '{key_name}' not found in {entry.filename}")
-        data = np.asarray(mat[key_name])
+        ext = entry.path.suffix.lower()
+
+        if ext == ".exr":
+            exr = loadexr(str(entry.path))
+            if key_name not in exr:
+                raise KeyError(f"Key '{key_name}' not found in {entry.filename}")
+            data = np.asarray(exr[key_name])
+        else:
+            mat = loadmat(str(entry.path), variable_names=[key_name])
+            if key_name not in mat:
+                raise KeyError(f"Key '{key_name}' not found in {entry.filename}")
+            data = np.asarray(mat[key_name])
+
         self._cache.put(cache_key, data)
         return data
 

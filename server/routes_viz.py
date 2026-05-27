@@ -184,3 +184,19 @@ async def viz_grayscale(
     img = viz.render_grayscale(data)
     return _image_response(img)
 
+
+@router.get("/rgb-direct")
+async def viz_rgb_direct(
+    file_id: str, key: str,
+    fm: FileManager = Depends(_get_fm),
+):
+    """Render a float (H, W, 3) RGB array as an image."""
+    try:
+        data = fm.load_key(file_id, key)
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+    if data.ndim != 3 or data.shape[2] != 3:
+        raise HTTPException(400, f"Expected (H, W, 3) array, got shape {data.shape}")
+    img = viz.render_rgb_direct(data)
+    return _image_response(img)
+

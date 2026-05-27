@@ -29,7 +29,7 @@ async function scanLocal() {
       ref="uploadRef"
       drag
       multiple
-      accept=".mat"
+      accept=".mat,.exr"
       :auto-upload="false"
       :on-change="handleChange"
       :show-file-list="false"
@@ -37,7 +37,7 @@ async function scanLocal() {
       <div class="file-uploader__hint">
         <p v-if="uploading">Uploading...</p>
         <template v-else>
-          <p>Drop .mat files here</p>
+          <p>Drop .mat / .exr files here</p>
           <p class="file-uploader__hint--sub">or click to browse</p>
         </template>
       </div>

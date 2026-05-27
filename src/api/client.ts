@@ -13,7 +13,7 @@ export interface KeyInfo {
   name: string;
   shape: number[];
   dtype: string;
-  dataType: "hsi_cube_batch" | "hsi_cube" | "metric_array" | "image_2d" | "unknown";
+  dataType: "hsi_cube_batch" | "hsi_cube" | "rgb_image" | "metric_array" | "image_2d" | "unknown";
 }
 
 export interface FileEntry {
@@ -110,6 +110,7 @@ export function dataTypeLabel(dt: string): string {
   const labels: Record<string, string> = {
     hsi_cube_batch: "HSI",
     hsi_cube: "HSI",
+    rgb_image: "RGB",
     metric_array: "1D",
     image_2d: "Gray",
     unknown: "?",

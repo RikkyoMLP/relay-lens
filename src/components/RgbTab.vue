@@ -21,6 +21,12 @@ const sections = computed(() => {
         return { file, rgbUrls: [grayUrl], errorUrls: [], isGrayscale: true };
       }
 
+      // Handle direct RGB images (e.g. from EXR files)
+      if (keyInfo.dataType === "rgb_image") {
+        const rgbUrl = vizUrl("rgb-direct", { file_id: file.fileId, key });
+        return { file, rgbUrls: [rgbUrl], errorUrls: [], isGrayscale: false };
+      }
+
       const count = getSceneCount(keyInfo);
       if (count === 0) return null;
 

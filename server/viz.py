@@ -177,3 +177,18 @@ def render_grayscale(data: np.ndarray) -> Image.Image:
         arr = np.zeros_like(arr)
     gray = np.clip(np.round(arr * 255), 0, 255).astype(np.uint8)
     return Image.fromarray(gray, mode="L")
+
+
+def render_rgb_direct(data: np.ndarray) -> Image.Image:
+    """Render a float (H, W, 3) RGB array as an image.
+
+    Values are clamped to [0, 1] then mapped to uint8.
+    If the data range exceeds 1.0, it is normalised by the max value first.
+    """
+    arr = data.astype(np.float64)
+    if arr.max() > 1.0 or arr.min() < 0.0:
+        max_val = arr.max()
+        if max_val > 0:
+            arr = arr / max_val
+    arr = np.clip(np.round(arr * 255), 0, 255).astype(np.uint8)
+    return Image.fromarray(arr, mode="RGB")

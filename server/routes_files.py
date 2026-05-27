@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, Header, UploadFile, File, HTTPException
 
-from .file_manager import FileManager, get_session_manager
+from .file_manager import FileManager, get_session_manager, SUPPORTED_EXTENSIONS
 
 router = APIRouter()
 
@@ -32,11 +32,11 @@ async def upload_files(
     files: list[UploadFile] = File(...),
     fm: FileManager = Depends(_get_fm),
 ):
-    """Upload one or more .mat files."""
+    """Upload one or more data files (.mat or .exr)."""
     results = []
     for f in files:
-        if not f.filename or not f.filename.endswith(".mat"):
-            raise HTTPException(400, f"Only .mat files are accepted, got: {f.filename}")
+        if not f.filename or not any(f.filename.endswith(ext) for ext in SUPPORTED_EXTENSIONS):
+            raise HTTPException(400, f"Unsupported file type: {f.filename}")
         content = await f.read()
         path = fm.save_uploaded(f.filename, content)
         entry = fm.scan_file(path)
@@ -46,7 +46,7 @@ async def upload_files(
 
 @router.post("/scan-local")
 async def scan_local(fm: FileManager = Depends(_get_fm)):
-    """Scan the input/ directory for .mat files."""
+    """Scan the input/ directory for supported data files."""
     entries = fm.scan_local_dir()
     return {"files": [_serialize_file(e) for e in entries]}
 
